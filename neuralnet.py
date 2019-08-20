@@ -1,3 +1,5 @@
+import requests
+import pandas as pd
 # Forecasting years, number of years to use for out-of-sample 
 num_years = 15
 # number of lags to use for regression
