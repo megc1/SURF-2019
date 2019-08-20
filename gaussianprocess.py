@@ -29,3 +29,29 @@ for label, indicator in indicators.items():
     url = template_url.format(country_str, indicator, 
                                   start_year, end_year)
     
+    # request data from WB url
+    json_data = requests.get(url)
+    
+    # convert JSON string to python object
+    json_data = json_data.json()
+    
+    # returns list where the first element is meta-data, and the second element is actual data
+    json_data = json_data[1]
+    
+    # Loop over all data points, pick out the values and append them to the data frame
+    for data_point in json_data:
+        country = data_point['country']['id']
+        # Create a variable for each country and indicator pair
+        item    = country + '_' + label
+        year    = data_point['date']  
+        value   = data_point['value']
+        
+        # Append to data frame
+        new_row  = pd.DataFrame([[item, year, value]],
+                                columns=['item', 'year', 'value'])
+        raw_data = raw_data.append(new_row)
+# Pivot the data to get unique years along the columns,
+# and variables along the rows
+raw_data = raw_data.pivot('year', 'item', 'value')
+# Let's look at the first few rows and columns
+print('\n', raw_data.iloc[:10, :5], '\n')
